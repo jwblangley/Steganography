@@ -29,8 +29,8 @@ public class Run {
 	public static BufferedImage baseImage, toBeRevealedImage;
 	public static long maxFileSize;
 
-	public static final int bitsToStore = 2 /* per colour channel, 1,2 or 4 */, sizeHeaderBits = 56; // allows up to 2^56 bytes (72 petabytes) //56 is divisible by 1,2,4 (bits per pixel)
-	public static final int extHeaderBits = 12 * 8; // allows file extensions to be up to 12 characters long (divides by 1,2,4)
+	public static final int BITS_TO_STORE = 2 /* per colour channel, 1,2 or 4 */, sizeHeaderBits = 56; // allows up to 2^56 bytes (72 petabytes) //56 is divisible by 1,2,4 (bits per pixel)
+	public static final int EXT_HEADER_BITS = 12 * 8; // allows file extensions to be up to 12 characters long (divides by 1,2,4)
 	public static final long ABSOLUTE_FILE_SIZE_LIMIT = Integer.MAX_VALUE; // mas storage for array
 	public static HiderFrame hider;
 	public static RevealerFrame revealer;
@@ -97,7 +97,7 @@ public class Run {
 			for (char l : fileExt.toCharArray()) {
 				headerBitString = headerBitString + new String(new char[8 - Integer.toBinaryString((int) (l)).length()]).replace("\0", "0") + Integer.toBinaryString((int) (l));
 			}
-			for (int i = 0; i < extHeaderBits / 8 - fileExt.length(); i++) {
+			for (int i = 0; i < EXT_HEADER_BITS / 8 - fileExt.length(); i++) {
 				headerBitString = headerBitString + new String(new char[8]).replace("\0", "0");
 			}
 
@@ -110,29 +110,29 @@ public class Run {
 					Color originalPixel = new Color(baseImage.getRGB(x, y));
 					int[] pixelRGB = new int[] { originalPixel.getRed(), originalPixel.getGreen(), originalPixel.getBlue() };
 					for (int c = 0; c < 3; c++) {
-						if (counter < extHeaderBits + sizeHeaderBits) {
+						if (counter < EXT_HEADER_BITS + sizeHeaderBits) {
 							// header
-							String bitSequence = headerBitString.substring(counter, counter + bitsToStore);
+							String bitSequence = headerBitString.substring(counter, counter + BITS_TO_STORE);
 							byte addValue = 0;
-							for (int i = 0; i < bitsToStore; i++) {
-								addValue += (Integer.parseInt(bitSequence.charAt(i) + "") << bitsToStore - i - 1);
+							for (int i = 0; i < BITS_TO_STORE; i++) {
+								addValue += (Integer.parseInt(bitSequence.charAt(i) + "") << BITS_TO_STORE - i - 1);
 							}
-							pixelRGB[c] = (((pixelRGB[c] >> bitsToStore) << bitsToStore) + addValue);
-							counter += bitsToStore;
+							pixelRGB[c] = (((pixelRGB[c] >> BITS_TO_STORE) << BITS_TO_STORE) + addValue);
+							counter += BITS_TO_STORE;
 						} else {
 							// data bits
-							int byteIndex = (dataCounter * bitsToStore) / 8;
+							int byteIndex = (dataCounter * BITS_TO_STORE) / 8;
 							if (byteIndex >= dataArray.length) {
 								continue;
 							}
-							int bitIndex = (dataCounter * bitsToStore) % 8;
+							int bitIndex = (dataCounter * BITS_TO_STORE) % 8;
 							String byteString = new String(new char[8 - Integer.toBinaryString(Byte.toUnsignedInt(dataArray[byteIndex])).length()]).replace("\0", "0") + Integer.toBinaryString(Byte.toUnsignedInt(dataArray[byteIndex]));
-							String bitSequence = byteString.substring(bitIndex, bitIndex + bitsToStore);
+							String bitSequence = byteString.substring(bitIndex, bitIndex + BITS_TO_STORE);
 							byte addValue = 0;
-							for (int i = 0; i < bitsToStore; i++) {
-								addValue += (Integer.parseInt(bitSequence.charAt(i) + "") << bitsToStore - i - 1);
+							for (int i = 0; i < BITS_TO_STORE; i++) {
+								addValue += (Integer.parseInt(bitSequence.charAt(i) + "") << BITS_TO_STORE - i - 1);
 							}
-							pixelRGB[c] = (((pixelRGB[c] >> bitsToStore) << bitsToStore) + addValue);
+							pixelRGB[c] = (((pixelRGB[c] >> BITS_TO_STORE) << BITS_TO_STORE) + addValue);
 							dataCounter++;
 						}
 					}
@@ -161,39 +161,39 @@ public class Run {
 				for (int c = 0; c < 3; c++) {
 					Color pixel = new Color(toBeRevealedImage.getRGB(x, y));
 					int[] pixelRGB = new int[] { pixel.getRed(), pixel.getGreen(), pixel.getBlue() };
-					int extractedData = pixelRGB[c] & ((bitsToStore << 1) - 1);
-					if (bitCounter < extHeaderBits) {
+					int extractedData = pixelRGB[c] & ((BITS_TO_STORE << 1) - 1);
+					if (bitCounter < EXT_HEADER_BITS) {
 						// file Ext
 						if (bitCounter != 0 && bitCounter % 8 == 0) {
 							fileExt = fileExt + (char) currentByte;
 							currentByte = 0;
 						}
-						currentByte += extractedData << (8 - bitsToStore * (1 + (bitCounter % 8) / bitsToStore));
-						bitCounter += bitsToStore;
+						currentByte += extractedData << (8 - BITS_TO_STORE * (1 + (bitCounter % 8) / BITS_TO_STORE));
+						bitCounter += BITS_TO_STORE;
 					} else {
-						if (bitCounter == extHeaderBits) {
+						if (bitCounter == EXT_HEADER_BITS) {
 							fileExt = fileExt.replaceAll("\0", "");
 						}
-						if (bitCounter < extHeaderBits + sizeHeaderBits) {
+						if (bitCounter < EXT_HEADER_BITS + sizeHeaderBits) {
 							// fileSize
-							fileSize <<= 2;
+							fileSize <<= BITS_TO_STORE;
 							fileSize += extractedData;
-							bitCounter += bitsToStore;
+							bitCounter += BITS_TO_STORE;
 						} else {
 							if (byteArrayCounter >= fileSize) {
 								break outer;
 							}
-							if (bitCounter == extHeaderBits + sizeHeaderBits) {
+							if (bitCounter == EXT_HEADER_BITS + sizeHeaderBits) {
 								dataOut = new byte[(int) fileSize];
 								currentByte = 0;
 							}
-							if (bitCounter != extHeaderBits + sizeHeaderBits && bitCounter % 8 == 0) {
+							if (bitCounter != EXT_HEADER_BITS + sizeHeaderBits && bitCounter % 8 == 0) {
 								dataOut[byteArrayCounter] = (byte) currentByte;
 								byteArrayCounter++;
 								currentByte = 0;
 							}
-							currentByte += extractedData << (8 - bitsToStore * (1 + (bitCounter % 8) / bitsToStore));
-							bitCounter += bitsToStore;
+							currentByte += extractedData << (8 - BITS_TO_STORE * (1 + (bitCounter % 8) / BITS_TO_STORE));
+							bitCounter += BITS_TO_STORE;
 
 						}
 					}

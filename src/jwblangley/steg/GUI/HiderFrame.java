@@ -78,9 +78,9 @@ public class HiderFrame extends JFrame implements ActionListener {
 	private void baseImageSelected(File imageFile) {
 		try {
 			Run.baseImage = ImageIO.read(imageFile);
-			if (Run.baseImage.getWidth() * Run.baseImage.getHeight() > (Run.extHeaderBits + Run.sizeHeaderBits) / 3 /* 3 colour channels */) {
+			if (Run.baseImage.getWidth() * Run.baseImage.getHeight() > (Run.EXT_HEADER_BITS + Run.sizeHeaderBits) / 3 /* 3 colour channels */) {
 
-				Run.maxFileSize = ((Run.baseImage.getWidth() * Run.baseImage.getHeight()) - (Run.extHeaderBits + Run.sizeHeaderBits) / (3*Run.bitsToStore)) * (3*Run.bitsToStore) / 8; // bits to store per channel and 3 channels per pixel
+				Run.maxFileSize = ((Run.baseImage.getWidth() * Run.baseImage.getHeight()) - (Run.EXT_HEADER_BITS + Run.sizeHeaderBits) / (3*Run.BITS_TO_STORE)) * (3*Run.BITS_TO_STORE) / 8; // bits to store per channel and 3 channels per pixel
 				Run.maxFileSize = Math.min(Run.maxFileSize, Run.ABSOLUTE_FILE_SIZE_LIMIT);
 				statusLabel.setText("Max File size:\t".toUpperCase() + humanReadableByteCount(Run.maxFileSize, false));
 			} else {
