@@ -17,7 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import jwblangley.steg.run.Menu;
+import jwblangley.steg.run.Steganography;
 
 public class HiderFrame extends JFrame implements ActionListener {
 
@@ -77,12 +77,12 @@ public class HiderFrame extends JFrame implements ActionListener {
 
 	private void baseImageSelected(File imageFile) {
 		try {
-			Menu.baseImage = ImageIO.read(imageFile);
-			if (Menu.baseImage.getWidth() * Menu.baseImage.getHeight() > (Menu.EXT_HEADER_BITS + Menu.sizeHeaderBits) / 3 /* 3 colour channels */) {
+			Steganography.baseImage = ImageIO.read(imageFile);
+			if (Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight() > (Steganography.EXT_HEADER_BITS + Steganography.sizeHeaderBits) / 3 /* 3 colour channels */) {
 
-				Menu.maxFileSize = ((Menu.baseImage.getWidth() * Menu.baseImage.getHeight()) - (Menu.EXT_HEADER_BITS + Menu.sizeHeaderBits) / (3*Menu.BITS_TO_STORE)) * (3*Menu.BITS_TO_STORE) / 8; // bits to store per channel and 3 channels per pixel
-				Menu.maxFileSize = Math.min(Menu.maxFileSize, Menu.ABSOLUTE_FILE_SIZE_LIMIT);
-				statusLabel.setText("Max File size:\t".toUpperCase() + humanReadableByteCount(Menu.maxFileSize, false));
+				Steganography.maxFileSize = ((Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight()) - (Steganography.EXT_HEADER_BITS + Steganography.sizeHeaderBits) / (3*Steganography.BITS_TO_STORE)) * (3*Steganography.BITS_TO_STORE) / 8; // bits to store per channel and 3 channels per pixel
+				Steganography.maxFileSize = Math.min(Steganography.maxFileSize, Steganography.ABSOLUTE_FILE_SIZE_LIMIT);
+				statusLabel.setText("Max File size:\t".toUpperCase() + humanReadableByteCount(Steganography.maxFileSize, false));
 			} else {
 				statusLabel.setText("base image too small".toUpperCase());
 				return;
@@ -94,11 +94,11 @@ public class HiderFrame extends JFrame implements ActionListener {
 	}
 
 	private void fileSelected(File source) {
-		if (source.length() < Menu.maxFileSize) {
+		if (source.length() < Steganography.maxFileSize) {
 			statusLabel.setText("Working...".toUpperCase());
 			statusLabel.paintImmediately(statusLabel.getVisibleRect());
-			Menu.sourceFile = source;
-			Menu.compileHide();
+			Steganography.sourceFile = source;
+			Steganography.compileHide();
 		}else{
 			statusLabel.setText("file too large".toUpperCase());
 		}

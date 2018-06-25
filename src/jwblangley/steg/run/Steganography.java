@@ -12,17 +12,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import jwblangley.steg.GUI.HiderFrame;
 import jwblangley.steg.GUI.RevealerFrame;
+import jwblangley.steg.GUI.MenuLayout;
 
-public class Menu extends Application {
+public class Steganography extends Application {
 
 	public static File sourceFile;
 	public static BufferedImage baseImage, toBeRevealedImage;
@@ -34,56 +31,12 @@ public class Menu extends Application {
 	public static HiderFrame hider;
 	public static RevealerFrame revealer;
 	public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
-  public final int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
+  public static final int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 
 	private static JButton hiderButton, revealerButton;
 
 	public static void main(String[] args) {
-
 		launch(args);
-
-		/*
-
-		Font font = new Font("Calibri", Font.PLAIN, HEIGHT / 50);
-		JFrame menuFrame = new JFrame("Stegonagraphy - jwblangley");
-		menuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		menuFrame.getContentPane().setLayout(new BorderLayout());
-
-		hiderButton = new JButton("Hide File");
-		hiderButton.setPreferredSize(new Dimension(WIDTH / 5, WIDTH / 10));
-		hiderButton.setFont(font);
-		hiderButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-				hider = new HiderFrame();
-				hiderButton.setEnabled(false);
-				revealerButton.setEnabled(false);
-			}
-		});
-		menuFrame.getContentPane().add(hiderButton, BorderLayout.LINE_START);
-
-		revealerButton = new JButton("Reveal File");
-		revealerButton.setPreferredSize(new Dimension(WIDTH / 5, WIDTH / 10));
-		revealerButton.setFont(font);
-		revealerButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-				revealer = new RevealerFrame();
-				hiderButton.setEnabled(false);
-				revealerButton.setEnabled(false);
-			}
-		});
-		menuFrame.getContentPane().add(revealerButton, BorderLayout.LINE_END);
-
-		menuFrame.pack();
-		menuFrame.setLocationRelativeTo(null);
-		menuFrame.setResizable(false);
-		menuFrame.setVisible(true);
-
-		// hider = new HiderFrame();
-		// revealer = new Revealer();
-
-    */
 	}
 
 	public static void compileHide() {
@@ -252,28 +205,9 @@ public class Menu extends Application {
 	@Override
 	public void start(Stage window) {
 
-	  window.setTitle("Steganography");
-    HBox layout = new HBox(5);
-    layout.setPrefSize(WIDTH * 0.15, HEIGHT * 0.1);
+    Scene scene = new Scene(MenuLayout.layout(window));
 
-    Font font = new Font("Arial", HEIGHT / 35);
-
-    Button hideButton = new Button("Hide File");
-    hideButton.setFont(font);
-    hideButton.setMinWidth(layout.getPrefWidth() / 2);
-    hideButton.setMaxHeight(Double.MAX_VALUE);
-    //TODO action handler
-
-    Button revealButton = new Button("Reveal File");
-    revealButton.setFont(font);
-    revealButton.setMinWidth(layout.getPrefWidth() / 2);
-    revealButton.setMaxHeight(Double.MAX_VALUE);
-    //TODO action handler
-
-    layout.getChildren().addAll(hideButton, revealButton);
-
-
-    Scene scene = new Scene(layout);
+    window.setTitle("Steganography");
     window.setScene(scene);
     window.centerOnScreen();
     window.show();

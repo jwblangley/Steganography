@@ -16,7 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import jwblangley.steg.run.Menu;
+import jwblangley.steg.run.Steganography;
 
 public class RevealerFrame extends JFrame implements ActionListener {
 
@@ -59,8 +59,8 @@ public class RevealerFrame extends JFrame implements ActionListener {
 			try {
 				statusLabel.setText("Working...".toUpperCase());
 				statusLabel.paintImmediately(statusLabel.getVisibleRect());
-				Menu.toBeRevealedImage = ImageIO.read(fileChooser.getSelectedFile());
-				Menu.compileReveal();
+				Steganography.toBeRevealedImage = ImageIO.read(fileChooser.getSelectedFile());
+				Steganography.compileReveal();
 			} catch (IOException e) {
 				statusLabel.setText("Error Reading File".toUpperCase());
 				e.printStackTrace();
