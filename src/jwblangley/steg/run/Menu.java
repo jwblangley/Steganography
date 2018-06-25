@@ -1,12 +1,7 @@
 package jwblangley.steg.run;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,15 +10,19 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
-import javax.swing.JFrame;
-
 import jwblangley.steg.GUI.HiderFrame;
 import jwblangley.steg.GUI.RevealerFrame;
 
-public class Run {
+public class Menu extends Application {
 
 	public static File sourceFile;
 	public static BufferedImage baseImage, toBeRevealedImage;
@@ -34,11 +33,17 @@ public class Run {
 	public static final long ABSOLUTE_FILE_SIZE_LIMIT = Integer.MAX_VALUE; // mas storage for array
 	public static HiderFrame hider;
 	public static RevealerFrame revealer;
-	public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width, HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
+	public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
+  public final int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 
 	private static JButton hiderButton, revealerButton;
 
 	public static void main(String[] args) {
+
+		launch(args);
+
+		/*
+
 		Font font = new Font("Calibri", Font.PLAIN, HEIGHT / 50);
 		JFrame menuFrame = new JFrame("Stegonagraphy - jwblangley");
 		menuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -77,6 +82,8 @@ public class Run {
 
 		// hider = new HiderFrame();
 		// revealer = new Revealer();
+
+    */
 	}
 
 	public static void compileHide() {
@@ -238,9 +245,37 @@ public class Run {
 		try {
 			ImageIO.write(img, "png", unusedFile(fileNameStub, "png"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
+	@Override
+	public void start(Stage window) {
+
+	  window.setTitle("Steganography");
+    HBox layout = new HBox(5);
+    layout.setPrefSize(WIDTH * 0.15, HEIGHT * 0.1);
+
+    Font font = new Font("Arial", HEIGHT / 35);
+
+    Button hideButton = new Button("Hide File");
+    hideButton.setFont(font);
+    hideButton.setMinWidth(layout.getPrefWidth() / 2);
+    hideButton.setMaxHeight(Double.MAX_VALUE);
+    //TODO action handler
+
+    Button revealButton = new Button("Reveal File");
+    revealButton.setFont(font);
+    revealButton.setMinWidth(layout.getPrefWidth() / 2);
+    revealButton.setMaxHeight(Double.MAX_VALUE);
+    //TODO action handler
+
+    layout.getChildren().addAll(hideButton, revealButton);
+
+
+    Scene scene = new Scene(layout);
+    window.setScene(scene);
+    window.centerOnScreen();
+    window.show();
+	}
 }

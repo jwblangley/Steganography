@@ -6,7 +6,6 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -17,7 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import jwblangley.steg.run.Run;
+import jwblangley.steg.run.Menu;
 
 public class RevealerFrame extends JFrame implements ActionListener {
 
@@ -60,8 +59,8 @@ public class RevealerFrame extends JFrame implements ActionListener {
 			try {
 				statusLabel.setText("Working...".toUpperCase());
 				statusLabel.paintImmediately(statusLabel.getVisibleRect());
-				Run.toBeRevealedImage = ImageIO.read(fileChooser.getSelectedFile());
-				Run.compileReveal();
+				Menu.toBeRevealedImage = ImageIO.read(fileChooser.getSelectedFile());
+				Menu.compileReveal();
 			} catch (IOException e) {
 				statusLabel.setText("Error Reading File".toUpperCase());
 				e.printStackTrace();

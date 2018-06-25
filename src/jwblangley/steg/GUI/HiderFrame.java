@@ -17,7 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import jwblangley.steg.run.Run;
+import jwblangley.steg.run.Menu;
 
 public class HiderFrame extends JFrame implements ActionListener {
 
@@ -77,12 +77,12 @@ public class HiderFrame extends JFrame implements ActionListener {
 
 	private void baseImageSelected(File imageFile) {
 		try {
-			Run.baseImage = ImageIO.read(imageFile);
-			if (Run.baseImage.getWidth() * Run.baseImage.getHeight() > (Run.EXT_HEADER_BITS + Run.sizeHeaderBits) / 3 /* 3 colour channels */) {
+			Menu.baseImage = ImageIO.read(imageFile);
+			if (Menu.baseImage.getWidth() * Menu.baseImage.getHeight() > (Menu.EXT_HEADER_BITS + Menu.sizeHeaderBits) / 3 /* 3 colour channels */) {
 
-				Run.maxFileSize = ((Run.baseImage.getWidth() * Run.baseImage.getHeight()) - (Run.EXT_HEADER_BITS + Run.sizeHeaderBits) / (3*Run.BITS_TO_STORE)) * (3*Run.BITS_TO_STORE) / 8; // bits to store per channel and 3 channels per pixel
-				Run.maxFileSize = Math.min(Run.maxFileSize, Run.ABSOLUTE_FILE_SIZE_LIMIT);
-				statusLabel.setText("Max File size:\t".toUpperCase() + humanReadableByteCount(Run.maxFileSize, false));
+				Menu.maxFileSize = ((Menu.baseImage.getWidth() * Menu.baseImage.getHeight()) - (Menu.EXT_HEADER_BITS + Menu.sizeHeaderBits) / (3*Menu.BITS_TO_STORE)) * (3*Menu.BITS_TO_STORE) / 8; // bits to store per channel and 3 channels per pixel
+				Menu.maxFileSize = Math.min(Menu.maxFileSize, Menu.ABSOLUTE_FILE_SIZE_LIMIT);
+				statusLabel.setText("Max File size:\t".toUpperCase() + humanReadableByteCount(Menu.maxFileSize, false));
 			} else {
 				statusLabel.setText("base image too small".toUpperCase());
 				return;
@@ -94,11 +94,11 @@ public class HiderFrame extends JFrame implements ActionListener {
 	}
 
 	private void fileSelected(File source) {
-		if (source.length() < Run.maxFileSize) {
+		if (source.length() < Menu.maxFileSize) {
 			statusLabel.setText("Working...".toUpperCase());
 			statusLabel.paintImmediately(statusLabel.getVisibleRect());
-			Run.sourceFile = source;
-			Run.compileHide();
+			Menu.sourceFile = source;
+			Menu.compileHide();
 		}else{
 			statusLabel.setText("file too large".toUpperCase());
 		}
