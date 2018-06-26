@@ -19,7 +19,7 @@ public class HiderLayout {
 
   private static Button baseButton, fileButton;
   private static Stage window;
-  private static Label statusLabel;
+  public static Label statusLabel;
 
   public static Pane layout(Stage windowIn) {
 
@@ -59,38 +59,53 @@ public class HiderLayout {
   private static void handleEvent(ActionEvent e) {
     // File chooser
     FileChooser fc = new FileChooser();
-    fc.setTitle("Base image");
-    FileChooser.ExtensionFilter imageFilter
-        = new ExtensionFilter("Image Files", ImageIO.getReaderFileSuffixes());
-//    fc.getExtensionFilters().add(imageFilter);
 
-    File baseImageFile = fc.showOpenDialog(window);
-    if (baseImageFile != null) {
-      if (e.getSource() == baseButton) {
-        baseImageSelected(baseImageFile);
-      } else if (e.getSource() == fileButton){
-        fileSelected(baseImageFile);
-      }
+    if (e.getSource() == baseButton) {
+      fc.setTitle("Base image");
+      FileChooser.ExtensionFilter imageFilter
+          = new ExtensionFilter("Image Files", Steganography.IMAGE_EXTENSIONS);
+      fc.getExtensionFilters().add(imageFilter);
+      baseImageSelected(fc.showOpenDialog(window));
+    } else if (e.getSource() == fileButton) {
+      fileSelected(fc.showOpenDialog(window));
     }
   }
 
   private static void fileSelected(File sourceFile) {
+    if (sourceFile == null) {
+      statusLabel.setText("Error reading image");
+      return;
+    }
+
     if (sourceFile.length() < Steganography.maxFileSize) {
       statusLabel.setText("Working...");
       Steganography.sourceFile = sourceFile;
       Steganography.compileHide();
-    }else {
+    } else {
       statusLabel.setText("file too large".toUpperCase());
     }
   }
 
   private static void baseImageSelected(File baseImageFile) {
+    if (baseImageFile == null) {
+      statusLabel.setText("Error reading image");
+      return;
+    }
     try {
       Steganography.baseImage = ImageIO.read(baseImageFile);
-      if (Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight() > (Steganography.EXT_HEADER_BITS + Steganography.sizeHeaderBits) / 3 /* 3 colour channels */) {
-        Steganography.maxFileSize = ((Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight()) - (Steganography.EXT_HEADER_BITS + Steganography.sizeHeaderBits) / (3*Steganography.BITS_TO_STORE)) * (3*Steganography.BITS_TO_STORE) / 8; // bits to store per channel and 3 channels per pixel
-        Steganography.maxFileSize = Math.min(Steganography.maxFileSize, Steganography.ABSOLUTE_FILE_SIZE_LIMIT);
-        statusLabel.setText("Max File size:\t".toUpperCase() + humanReadableByteCount(Steganography.maxFileSize, false));
+      if (Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight()
+          > (Steganography.EXT_HEADER_BITS + Steganography.sizeHeaderBits)
+          / 3 /* 3 colour channels */) {
+        Steganography.maxFileSize =
+            ((Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight())
+                - (Steganography.EXT_HEADER_BITS + Steganography.sizeHeaderBits) / (3
+                * Steganography.BITS_TO_STORE)) * (3 * Steganography.BITS_TO_STORE)
+                / 8; // bits to store per channel and 3 channels per pixel
+        Steganography.maxFileSize = Math
+            .min(Steganography.maxFileSize, Steganography.ABSOLUTE_FILE_SIZE_LIMIT);
+        statusLabel.setText(
+            "Max File size:\t".toUpperCase() + humanReadableByteCount(Steganography.maxFileSize,
+                false));
       } else {
         statusLabel.setText("Base image too small");
         return;
@@ -103,8 +118,9 @@ public class HiderLayout {
 
   public static String humanReadableByteCount(long bytes, boolean si) {
     int unit = si ? 1000 : 1024;
-    if (bytes < unit)
+    if (bytes < unit) {
       return bytes + " B";
+    }
     int exp = (int) (Math.log(bytes) / Math.log(unit));
     String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
     return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);

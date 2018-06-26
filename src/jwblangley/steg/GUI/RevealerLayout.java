@@ -1,7 +1,6 @@
 package jwblangley.steg.GUI;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,12 +13,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import jwblangley.steg.run.Steganography;
 
 public class RevealerLayout {
 
-  private static Label statusLabel;
+  public static Label statusLabel;
 
   public static Pane layout(Stage window) {
     BorderPane topNode = new BorderPane();
@@ -52,8 +50,8 @@ public class RevealerLayout {
     FileChooser fc = new FileChooser();
     fc.setTitle("Image file to reveal from");
     FileChooser.ExtensionFilter imageFilter
-        = new ExtensionFilter("Image Files", ImageIO.getReaderFileSuffixes());
-//    fc.getExtensionFilters().add(imageFilter);
+        = new ExtensionFilter("Image Files", Steganography.IMAGE_EXTENSIONS);
+    fc.getExtensionFilters().add(imageFilter);
 
     File imageFile = fc.showOpenDialog(window);
     if (imageFile != null) {
