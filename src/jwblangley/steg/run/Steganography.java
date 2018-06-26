@@ -26,8 +26,6 @@ public class Steganography extends Application {
 	public static final int BITS_TO_STORE = 2 /* per colour channel, 1,2 or 4 */, sizeHeaderBits = 56; // allows up to 2^56 bytes (72 petabytes) //56 is divisible by 1,2,4 (bits per pixel)
 	public static final int EXT_HEADER_BITS = 12 * 8; // allows file extensions to be up to 12 characters long (divides by 1,2,4)
 	public static final long ABSOLUTE_FILE_SIZE_LIMIT = Integer.MAX_VALUE; // max storage for array
-//	public static HiderFrame hider;
-//	public static RevealerFrame revealer;
 	public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
   public static final int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 
@@ -101,7 +99,7 @@ public class Steganography extends Application {
 //			hiderButton.setEnabled(true);
 //			revealerButton.setEnabled(true);
 //			hider.statusLabel.setText("done".toUpperCase());
-//
+      System.out.println("Done");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -170,6 +168,7 @@ public class Steganography extends Application {
 //		hiderButton.setEnabled(true);
 //		revealerButton.setEnabled(true);
 //		revealer.statusLabel.setText("done".toUpperCase());
+    System.out.println("Done");
 
 	}
 

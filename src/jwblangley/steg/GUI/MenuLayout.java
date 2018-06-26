@@ -20,7 +20,7 @@ public class MenuLayout {
     hideButton.setFont(font);
     hideButton.setMinWidth(layout.getPrefWidth() / 2);
     hideButton.setMaxHeight(Double.MAX_VALUE);
-    hideButton.setOnAction(e -> window.setScene(new Scene(HiderLayout.layout())));
+    hideButton.setOnAction(e -> window.setScene(new Scene(HiderLayout.layout(window))));
 
     Button revealButton = new Button("Reveal File");
     revealButton.setFont(font);

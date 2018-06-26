@@ -53,7 +53,7 @@ public class RevealerLayout {
     fc.setTitle("Image file to reveal from");
     FileChooser.ExtensionFilter imageFilter
         = new ExtensionFilter("Image Files", ImageIO.getReaderFileSuffixes());
-    fc.getExtensionFilters().add(imageFilter);
+//    fc.getExtensionFilters().add(imageFilter);
 
     File imageFile = fc.showOpenDialog(window);
     if (imageFile != null) {
