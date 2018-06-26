@@ -40,7 +40,8 @@ public class Steganography extends Application {
   public static final int NAME_HEADER_SIZE = 255;
   // R G B
   public static final int CHANNELS = 3;
-  public static final int BUFFER_SIZE = 16 * 1024;
+  // Must be a multiple of CHANNELS
+  public static final int BUFFER_SIZE = CHANNELS * 16 * 1024;
 
   public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
   public static final int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -85,11 +86,28 @@ public class Steganography extends Application {
       int len = headerBytes.size();
       for (int y = 0; y < resultImage.getHeight(); y++) {
         for (int x = 0; x < resultImage.getWidth(); x++) {
+          // Base colour
           Color col = new Color(baseImage.getRGB(x, y));
           int[] pixelRGB = new int[]{col.getRed(), col.getGreen(), col.getGreen()};
-          if (b < len) {
 
+          for (int c = 0; c < CHANNELS; c++) {
+            if (BITS_TO_STORE == 8) {
+              byte dataByte = buf[b];
+              pixelRGB[c] = dataByte;
+              if (b < len - 1) {
+                b++;
+              } else {
+                len = in.read(buf);
+                b = 0;
+              }
+            }else if (BITS_TO_STORE == 4) {
+
+            }
           }
+
+
+
+          resultImage.setRGB(x, y, new Color(pixelRGB[0], pixelRGB[1], pixelRGB[2]).getRGB());
         }
       }
     } catch (IOException e) {
