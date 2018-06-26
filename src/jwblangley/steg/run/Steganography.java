@@ -100,8 +100,12 @@ public class Steganography extends Application {
                 len = in.read(buf);
                 b = 0;
               }
-            }else if (BITS_TO_STORE == 4) {
-
+            } else if (BITS_TO_STORE == 4) {
+              //TODO
+            } else if (BITS_TO_STORE == 2) {
+              //TODO
+            } else if (BITS_TO_STORE == 1) {
+              //TODO
             }
           }
 
@@ -123,7 +127,7 @@ public class Steganography extends Application {
   }
 
   public static void compileReveal() {
-
+    //TODO: calculate data in dataOut and fileName
     try {
       FileOutputStream stream = new FileOutputStream(unusedFile("reveal", fileExt));
       stream.write(dataOut);
