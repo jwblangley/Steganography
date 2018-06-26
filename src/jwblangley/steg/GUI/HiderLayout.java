@@ -94,11 +94,11 @@ public class HiderLayout {
     try {
       Steganography.baseImage = ImageIO.read(baseImageFile);
       if (Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight()
-          > (Steganography.EXT_HEADER_BITS + Steganography.sizeHeaderBits)
+          > (Steganography.EXT_HEADER_BITS + Steganography.SIZE_HEADER_BITS)
           / 3 /* 3 colour channels */) {
         Steganography.maxFileSize =
             ((Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight())
-                - (Steganography.EXT_HEADER_BITS + Steganography.sizeHeaderBits) / (3
+                - (Steganography.EXT_HEADER_BITS + Steganography.SIZE_HEADER_BITS) / (3
                 * Steganography.BITS_TO_STORE)) * (3 * Steganography.BITS_TO_STORE)
                 / 8; // bits to store per channel and 3 channels per pixel
         Steganography.maxFileSize = Math

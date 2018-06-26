@@ -7,8 +7,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.application.Application;
@@ -25,10 +28,16 @@ public class Steganography extends Application {
   public static BufferedImage baseImage, toBeRevealedImage;
   public static long maxFileSize;
 
-  public static final int BITS_TO_STORE = 2 /* per colour channel, 1,2 or 4 */, sizeHeaderBits = 56; // allows up to 2^56 bytes (72 petabytes) //56 is divisible by 1,2,4 (bits per pixel)
-  public static final int EXT_HEADER_BITS =
-      12 * 8; // allows file extensions to be up to 12 characters long (divides by 1,2,4)
-  public static final long ABSOLUTE_FILE_SIZE_LIMIT = Integer.MAX_VALUE; // max storage for array
+  // 2 per colour channel, 1,2,4 or 8
+  public static final int BITS_TO_STORE = 2;
+  // Allows up to 2^56 bytes (72 petabytes) - 56 is divisible by 1,2,4,8 (bits per pixel)
+  public static final int SIZE_HEADER_BITS = 56;
+  // Allows file extensions to be up to 255 characters long
+  public static final int NAME_HEADER_SIZE = 255;
+
+  // R G B
+  public static final int CHANNELS = 3;
+
   public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
   public static final int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 
@@ -43,21 +52,35 @@ public class Steganography extends Application {
   }
 
   public static void compileHide() {
+    //TODO assertions
+
     BufferedImage resultImage = new BufferedImage(baseImage.getWidth(), baseImage.getHeight(),
         BufferedImage.TYPE_INT_RGB);
 
     try {
+      List<Byte> computedBytes = new ArrayList<>();
+
+      // Bits to store
+      computedBytes.add((byte) BITS_TO_STORE);
+
+      // Filename: size then bytes in UTF-8
+      byte[] fileNameBytes = sourceFile.getName().getBytes(StandardCharsets.UTF_8);
+      assert fileNameBytes.length <= NAME_HEADER_SIZE : "Filename too long";
+      byte nameSize = (byte) fileNameBytes.length;
+      computedBytes.add(nameSize);
+      addBytesToList(computedBytes, fileNameBytes);
+
+
+      //TODO: Done up to here
+
       byte[] dataArray = Files.readAllBytes(sourceFile.toPath());
 
       long fileLength = sourceFile.length();
 
-      String headerBitString = "";
 
-      // file ext header
-      Pattern p = Pattern.compile(".+\\.(.+)$");
-      Matcher m = p.matcher(sourceFile.getPath());
-      m.matches();
-      String fileExt = m.group(1);
+
+
+
       for (char l : fileExt.toCharArray()) {
         headerBitString =
             headerBitString + new String(new char[8 - Integer.toBinaryString((int) (l)).length()])
@@ -69,7 +92,7 @@ public class Steganography extends Application {
 
       // file Size header
       headerBitString = headerBitString + new String(
-          new char[sizeHeaderBits - Long.toBinaryString(fileLength).length()]).replace("\0", "0")
+          new char[SIZE_HEADER_BITS - Long.toBinaryString(fileLength).length()]).replace("\0", "0")
           + Long.toBinaryString(fileLength);
 
       int counter = 0, dataCounter = 0;
@@ -79,7 +102,7 @@ public class Steganography extends Application {
           int[] pixelRGB = new int[]{originalPixel.getRed(), originalPixel.getGreen(),
               originalPixel.getBlue()};
           for (int c = 0; c < 3; c++) {
-            if (counter < EXT_HEADER_BITS + sizeHeaderBits) {
+            if (counter < EXT_HEADER_BITS + SIZE_HEADER_BITS) {
               // header
               String bitSequence = headerBitString.substring(counter, counter + BITS_TO_STORE);
               byte addValue = 0;
@@ -144,7 +167,7 @@ public class Steganography extends Application {
             if (bitCounter == EXT_HEADER_BITS) {
               fileExt = fileExt.replaceAll("\0", "");
             }
-            if (bitCounter < EXT_HEADER_BITS + sizeHeaderBits) {
+            if (bitCounter < EXT_HEADER_BITS + SIZE_HEADER_BITS) {
               // fileSize
               fileSize <<= BITS_TO_STORE;
               fileSize += extractedData;
@@ -153,11 +176,11 @@ public class Steganography extends Application {
               if (byteArrayCounter >= fileSize) {
                 break outer;
               }
-              if (bitCounter == EXT_HEADER_BITS + sizeHeaderBits) {
+              if (bitCounter == EXT_HEADER_BITS + SIZE_HEADER_BITS) {
                 dataOut = new byte[(int) fileSize];
                 currentByte = 0;
               }
-              if (bitCounter != EXT_HEADER_BITS + sizeHeaderBits && bitCounter % 8 == 0) {
+              if (bitCounter != EXT_HEADER_BITS + SIZE_HEADER_BITS && bitCounter % 8 == 0) {
                 dataOut[byteArrayCounter] = (byte) currentByte;
                 byteArrayCounter++;
                 currentByte = 0;
@@ -182,6 +205,12 @@ public class Steganography extends Application {
     }
     RevealerLayout.statusLabel.setText("Done");
 
+  }
+
+  private static void addBytesToList(List<Byte> bList, byte[] bArr) {
+    for (byte b : bArr) {
+      bList.add(b);
+    }
   }
 
   public static boolean[] byteArrayToBitArray(byte[] bytes) {
