@@ -26,7 +26,7 @@ public class MenuLayout {
     revealButton.setFont(font);
     revealButton.setMinWidth(layout.getPrefWidth() / 2);
     revealButton.setMaxHeight(Double.MAX_VALUE);
-    revealButton.setOnAction(e -> window.setScene(new Scene(RevealerLayout.layout())));
+    revealButton.setOnAction(e -> window.setScene(new Scene(RevealerLayout.layout(window))));
 
     layout.getChildren().addAll(hideButton, revealButton);
 

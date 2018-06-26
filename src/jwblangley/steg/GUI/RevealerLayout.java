@@ -1,30 +1,74 @@
 package jwblangley.steg.GUI;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
+import javax.imageio.ImageIO;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import jwblangley.steg.run.Steganography;
 
 public class RevealerLayout {
 
-  public static Pane layout() {
-    HBox layout = new HBox();
-    layout.setPrefSize(Steganography.WIDTH * 0.075, Steganography.HEIGHT * 0.1);
+  private static Label statusLabel;
 
+  public static Pane layout(Stage window) {
+    BorderPane topNode = new BorderPane();
     Font font = new Font("Arial", Steganography.HEIGHT / 35);
+
+    // Border top
+    HBox borderTopLayout = new HBox();
+    borderTopLayout.setPrefSize(Steganography.WIDTH * 0.15, Steganography.HEIGHT * 0.1);
 
     Button imageButton = new Button("Choose Image");
     imageButton.setFont(font);
     HBox.setHgrow(imageButton, Priority.ALWAYS);
     imageButton.setMaxWidth(Double.MAX_VALUE);
     imageButton.setMaxHeight(Double.MAX_VALUE);
-    // TODO action handler
+    imageButton.setOnAction(actionEvent -> reveal(window));
 
-    layout.getChildren().add(imageButton);
+    borderTopLayout.getChildren().add(imageButton);
+    topNode.setTop(borderTopLayout);
 
-    return layout;
+    // Rest of BorderPane
+    statusLabel = new Label();
+    statusLabel.setFont(Font.font("Arial", Steganography.HEIGHT / 50));
+    topNode.setCenter(statusLabel);
+
+    return topNode;
+  }
+
+  private static void reveal(Stage window) {
+    // File chooser
+    FileChooser fc = new FileChooser();
+    fc.setTitle("Image file to reveal from");
+    FileChooser.ExtensionFilter imageFilter
+        = new ExtensionFilter("Image Files", ImageIO.getReaderFileSuffixes());
+    fc.getExtensionFilters().add(imageFilter);
+
+    File imageFile = fc.showOpenDialog(window);
+    if (imageFile != null) {
+      try {
+        statusLabel.setText("Working...");
+        Steganography.toBeRevealedImage = ImageIO.read(imageFile);
+        Steganography.compileReveal();
+      } catch (IOException e) {
+        e.printStackTrace();
+        statusLabel.setText("Error: Failed to read file");
+      }
+    } else {
+      statusLabel.setText("Error: Cannot read file");
+      return;
+    }
   }
 
 }
