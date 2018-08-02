@@ -33,10 +33,10 @@ public class Steganography extends Application {
   public static BufferedImage baseImage, toBeRevealedImage;
   public static long maxFileSize;
 
-  // 2 per colour channel, 1,2,4 or 8
+  // per colour channel, 1,2,4 or 8
   //TODO: as slider
   public static final int BITS_TO_STORE = 2;
-  // Allows file extensions to be up to 255 characters long
+  // Allows file names to be up to 255 characters long
   public static final int NAME_HEADER_SIZE = 255;
   // R G B
   public static final int CHANNELS = 3;
@@ -69,6 +69,7 @@ public class Steganography extends Application {
 
     // Filename: size then bytes in UTF-8
     byte[] fileNameBytes = sourceFile.getName().getBytes(StandardCharsets.UTF_8);
+    System.out.println(sourceFile.getName());
     assert fileNameBytes.length <= NAME_HEADER_SIZE : "Filename too long";
     byte nameSize = (byte) fileNameBytes.length;
     headerBytes.add(nameSize);
@@ -128,6 +129,7 @@ public class Steganography extends Application {
 
   public static void compileReveal() {
     //TODO: calculate data in dataOut and fileName
+    byte[] dataOut = null;
     try {
       FileOutputStream stream = new FileOutputStream(unusedFile("reveal", fileExt));
       stream.write(dataOut);

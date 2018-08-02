@@ -8,14 +8,33 @@ import javax.imageio.ImageIO;
 
 public class Utils {
 
-  public static File unusedFile(String filename, String fileExt) {
+  public static File unusedFile(String filename, String fileExt, boolean dot) {
     int counter = 1;
     File tempFile;
     do {
-      tempFile = new File(filename + counter + "." + fileExt);
+      tempFile = new File(filename + counter + (dot ? "." : "") + fileExt);
       counter++;
     } while (tempFile.exists());
     return tempFile;
+  }
+
+  public static File unusedFile(String filename, String fileExt) {
+    return unusedFile(filename, fileExt, true);
+  }
+
+  public static File noOverrideFile(String filename) {
+    File file = new File(filename);
+    if (!file.exists()) {
+      return file;
+    }
+    int dotIndex = filename.indexOf(".");
+    if (dotIndex < 0) {
+      // File name without dot
+      return unusedFile(filename, "", false);
+    }
+    String name = filename.substring(0, dotIndex);
+    String fileExt = filename.substring(dotIndex + 1);
+    return unusedFile(name, fileExt);
   }
 
   public static void saveImage(BufferedImage img, String fileNameStub) {
