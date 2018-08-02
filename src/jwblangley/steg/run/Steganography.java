@@ -35,12 +35,12 @@ public class Steganography extends Application {
 
   // per colour channel, 1,2,4 or 8
   //TODO: as slider
-  public static final int BITS_TO_STORE = 2;
+  public static int bitsToStore = 2;
   // Allows file names to be up to 255 characters long
   public static final int NAME_HEADER_SIZE = 255;
   // R G B
   public static final int CHANNELS = 3;
-  // Must be a multiple of CHANNELS
+  // Must be a multiple of CHANNELS - 3KB
   public static final int BUFFER_SIZE = CHANNELS * 16 * 1024;
 
   public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -57,21 +57,39 @@ public class Steganography extends Application {
   }
 
   public static void compileHide() {
-    //TODO assertions
+    //TODO assertions (size of image)
 
     BufferedImage resultImage = new BufferedImage(baseImage.getWidth(), baseImage.getHeight(),
         BufferedImage.TYPE_INT_RGB);
 
+    // Store bitsToStore within first pixel for rest of image
+    int bitNum;
+    for (bitNum = 0; bitNum < 4; bitNum++) {
+      if (1 >> bitNum == bitsToStore) {
+        break;
+      }
+    }
+
+    Color firstCol = new Color(baseImage.getRGB(0, 0));
+    int r = firstCol.getRed() & ((2 & bitNum) >> 1);
+    int b = firstCol.getBlue() & 1 & bitNum;
+
+    resultImage.setRGB(0, 0, new Color(r, firstCol.getGreen(), b).getRGB());
+
     List<Byte> headerBytes = new ArrayList<>();
 
-    // Bits to store
-    headerBytes.add((byte) BITS_TO_STORE);
-
     // Filename: size then bytes in UTF-8
-    byte[] fileNameBytes = sourceFile.getName().getBytes(StandardCharsets.UTF_8);
+    //TODO check that getName includes file extension
     System.out.println(sourceFile.getName());
-    assert fileNameBytes.length <= NAME_HEADER_SIZE : "Filename too long";
+    byte[] fileNameBytes = sourceFile.getName().getBytes(StandardCharsets.UTF_8);
+
+    if (fileNameBytes.length > NAME_HEADER_SIZE) {
+      HiderLayout.statusLabel.setText("Filename too long");
+      return;
+    }
+    // Cannot overflow byte - enforced with NAME_HEADER_SIZE
     byte nameSize = (byte) fileNameBytes.length;
+
     headerBytes.add(nameSize);
     addBytesToList(headerBytes, fileNameBytes);
 
@@ -92,7 +110,7 @@ public class Steganography extends Application {
           int[] pixelRGB = new int[]{col.getRed(), col.getGreen(), col.getGreen()};
 
           for (int c = 0; c < CHANNELS; c++) {
-            if (BITS_TO_STORE == 8) {
+            if (bitsToStore == 8) {
               byte dataByte = buf[b];
               pixelRGB[c] = dataByte;
               if (b < len - 1) {
@@ -101,11 +119,11 @@ public class Steganography extends Application {
                 len = in.read(buf);
                 b = 0;
               }
-            } else if (BITS_TO_STORE == 4) {
+            } else if (bitsToStore == 4) {
               //TODO
-            } else if (BITS_TO_STORE == 2) {
+            } else if (bitsToStore == 2) {
               //TODO
-            } else if (BITS_TO_STORE == 1) {
+            } else if (bitsToStore == 1) {
               //TODO
             }
           }

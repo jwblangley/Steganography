@@ -53,10 +53,11 @@ public class Utils {
 
   public static byte[] longToByteArray(long x) {
     //TODO: test this
+    // Big endian
     final int SIZE_OF_LONG = 8;
     byte[] arr = new byte[SIZE_OF_LONG];
     for (int i = SIZE_OF_LONG - 1; i >= 0; i--) {
-      arr[i] = (byte) (((0xFF << (i * 8)) & x) >> (i * 8));
+      arr[SIZE_OF_LONG - 1 - i] = (byte) (((0xFF << (i * 8)) & x) >> (i * 8));
     }
     return arr;
   }
@@ -67,6 +68,16 @@ public class Utils {
       bArr[i] = bList.get(i);
     }
     return bArr;
+  }
+
+  public static String humanReadableByteCount(long bytes, boolean si) {
+    int unit = si ? 1000 : 1024;
+    if (bytes < unit) {
+      return bytes + " B";
+    }
+    int exp = (int) (Math.log(bytes) / Math.log(unit));
+    String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
   }
 
 }

@@ -97,8 +97,8 @@ public class HiderLayout {
 //        Steganography.maxFileSize =
 //            ((Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight())
 //                - (Steganography.EXT_HEADER_BITS + Steganography.SIZE_HEADER_BITS) / (3
-//                * Steganography.BITS_TO_STORE)) * (3 * Steganography.BITS_TO_STORE)
-//                / 8; // bits to store per channel and 3 channels per pixel
+//                * Steganography.bitsToStore)) * (3 * Steganography.bitsToStore)
+//                / 8; // bitsToStore to store per channel and 3 channels per pixel
 //        Steganography.maxFileSize = Math
 //            .min(Steganography.maxFileSize, Steganography.ABSOLUTE_FILE_SIZE_LIMIT);
 //        statusLabel.setText(
@@ -114,14 +114,5 @@ public class HiderLayout {
     fileButton.setDisable(false);
   }
 
-  public static String humanReadableByteCount(long bytes, boolean si) {
-    int unit = si ? 1000 : 1024;
-    if (bytes < unit) {
-      return bytes + " B";
-    }
-    int exp = (int) (Math.log(bytes) / Math.log(unit));
-    String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
-    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
-  }
 
 }
