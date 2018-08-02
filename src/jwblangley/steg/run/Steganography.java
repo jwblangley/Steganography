@@ -79,14 +79,13 @@ public class Steganography extends Application {
     List<Byte> headerBytes = new ArrayList<>();
 
     // Filename: size then bytes in UTF-8
-    //TODO check that getName includes file extension
-    System.out.println(sourceFile.getName());
     byte[] fileNameBytes = sourceFile.getName().getBytes(StandardCharsets.UTF_8);
 
     if (fileNameBytes.length > NAME_HEADER_SIZE) {
       HiderLayout.statusLabel.setText("Filename too long");
       return;
     }
+
     // Cannot overflow byte - enforced with NAME_HEADER_SIZE
     byte nameSize = (byte) fileNameBytes.length;
 

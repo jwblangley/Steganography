@@ -95,13 +95,20 @@ public class HiderLayout {
     }
     try {
       Steganography.baseImage = ImageIO.read(baseImageFile);
-      // First pixel taken to encode bitsToStore
-      int potentialSize =
-          Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight() - 1;
-      potentialSize -=
 
-      statusLabel.setText(
-          "Max File size:\t".toUpperCase() + humanReadableByteCount(Steganography.maxFileSize,
+      // Calculate maximum file size
+      // First pixel taken to encode bitsToStore
+      long potentialSize =
+          (Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight() - 1)
+          * Steganography.CHANNELS * Steganography.bitsToStore / 8;
+      // 1 byte for filename size and a maximum of 255 bytes for filename;
+      potentialSize -= 256;
+      // 4 bytes for the long that stores the size of the source file;
+      potentialSize -= 4;
+      Steganography.maxFileSize = potentialSize;
+
+      statusLabel.setText("Max File size: "
+          + humanReadableByteCount(Steganography.maxFileSize, false));
 
     } catch (IOException e) {
       statusLabel.setText("Cannot process this image type");
