@@ -1,6 +1,9 @@
 package jwblangley.steg.GUI;
 
+import static jwblangley.steg.run.Utils.humanReadableByteCount;
+
 import java.io.File;
+import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,6 +14,7 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javax.imageio.ImageIO;
 import jwblangley.steg.run.Steganography;
 
 public class HiderLayout {
@@ -85,32 +89,23 @@ public class HiderLayout {
   }
 
   private static void baseImageSelected(File baseImageFile) {
-//    if (baseImageFile == null) {
-//      statusLabel.setText("Error reading image");
-//      return;
-//    }
-//    try {
-//      Steganography.baseImage = ImageIO.read(baseImageFile);
-//      if (Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight()
-//          > (Steganography.EXT_HEADER_BITS + Steganography.SIZE_HEADER_BITS)
-//          / 3 /* 3 colour channels */) {
-//        Steganography.maxFileSize =
-//            ((Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight())
-//                - (Steganography.EXT_HEADER_BITS + Steganography.SIZE_HEADER_BITS) / (3
-//                * Steganography.bitsToStore)) * (3 * Steganography.bitsToStore)
-//                / 8; // bitsToStore to store per channel and 3 channels per pixel
-//        Steganography.maxFileSize = Math
-//            .min(Steganography.maxFileSize, Steganography.ABSOLUTE_FILE_SIZE_LIMIT);
-//        statusLabel.setText(
-//            "Max File size:\t".toUpperCase() + humanReadableByteCount(Steganography.maxFileSize,
-//                false));
-//      } else {
-//        statusLabel.setText("Base image too small");
-//        return;
-//      }
-//    } catch (IOException e) {
-//      statusLabel.setText("Cannot process this image type");
-//    }
+    if (baseImageFile == null) {
+      statusLabel.setText("Error reading image");
+      return;
+    }
+    try {
+      Steganography.baseImage = ImageIO.read(baseImageFile);
+      // First pixel taken to encode bitsToStore
+      int potentialSize =
+          Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight() - 1;
+      potentialSize -=
+
+      statusLabel.setText(
+          "Max File size:\t".toUpperCase() + humanReadableByteCount(Steganography.maxFileSize,
+
+    } catch (IOException e) {
+      statusLabel.setText("Cannot process this image type");
+    }
     fileButton.setDisable(false);
   }
 

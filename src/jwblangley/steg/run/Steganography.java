@@ -40,7 +40,7 @@ public class Steganography extends Application {
   public static final int NAME_HEADER_SIZE = 255;
   // R G B
   public static final int CHANNELS = 3;
-  // Must be a multiple of CHANNELS - 3KB
+  // Must be a multiple of CHANNELS - 54KB
   public static final int BUFFER_SIZE = CHANNELS * 16 * 1024;
 
   public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -69,13 +69,13 @@ public class Steganography extends Application {
         break;
       }
     }
-
     Color firstCol = new Color(baseImage.getRGB(0, 0));
-    int r = firstCol.getRed() & ((2 & bitNum) >> 1);
-    int b = firstCol.getBlue() & 1 & bitNum;
+    int pixR = firstCol.getRed() & ((2 & bitNum) >> 1);
+    int pixB = firstCol.getBlue() & 1 & bitNum;
+    resultImage.setRGB(0, 0, new Color(pixR, firstCol.getGreen(), pixB).getRGB());
 
-    resultImage.setRGB(0, 0, new Color(r, firstCol.getGreen(), b).getRGB());
 
+    // To store indeterminate number of bytes in header
     List<Byte> headerBytes = new ArrayList<>();
 
     // Filename: size then bytes in UTF-8
@@ -100,32 +100,60 @@ public class Steganography extends Application {
     // Data and write to image
     try {
       BufferedInputStream in = new BufferedInputStream(new FileInputStream(sourceFile));
-      byte[] buf = Arrays.copyOf(byteListToByteArray(headerBytes), BUFFER_SIZE);
-      int b = 0;
-      int len = headerBytes.size();
+
+      byte[] buf = byteListToByteArray(headerBytes);
+
+      byte bufferByte = 0;
+      int bitPos = 0;
+      int bytePos = 0;
+
+      // Data write loop
       for (int y = 0; y < resultImage.getHeight(); y++) {
-        for (int x = 0; x < resultImage.getWidth(); x++) {
+        for (int x = (y == 0 ? 1 : 0); x < resultImage.getWidth(); x++) {
+
           // Base colour
           Color col = new Color(baseImage.getRGB(x, y));
           int[] pixelRGB = new int[]{col.getRed(), col.getGreen(), col.getGreen()};
 
+          int readLen = 0;
           for (int c = 0; c < CHANNELS; c++) {
-            if (bitsToStore == 8) {
-              byte dataByte = buf[b];
-              pixelRGB[c] = dataByte;
-              if (b < len - 1) {
-                b++;
+            if (bitPos >= 8) {
+              bitPos = 0;
+              bytePos++;
+              if (bytePos < buf.length) {
+                bufferByte = buf[bytePos];
               } else {
-                len = in.read(buf);
-                b = 0;
+                bytePos = 0;
+                buf = new byte[BUFFER_SIZE];
+                readLen = in.read(buf);
+                if (readLen < 0) {
+                  // byte stream complete
+                  break;
+                } else {
+                  bufferByte = buf[bytePos];
+                  bytePos++;
+                }
               }
-            } else if (bitsToStore == 4) {
-              //TODO
-            } else if (bitsToStore == 2) {
-              //TODO
-            } else if (bitsToStore == 1) {
-              //TODO
             }
+
+            switch (bitsToStore) {
+              case 8:
+                pixelRGB[c] = bufferByte;
+                break;
+              case 4:
+                pixelRGB[c] &= 0xF0;
+                pixelRGB[c] += (bufferByte & (0xF << 4 - bitPos)) >> (4 - bitPos);
+                break;
+              case 2:
+                pixelRGB[c] &= 0xFC;
+                pixelRGB[c] += (bufferByte & (0x3 << 6 - bitPos)) >> (6 - bitPos);
+                break;
+              case 1:
+                pixelRGB[c] &= 0xFE;
+                pixelRGB[c] += (bufferByte & (0x1 << 7 - bitPos)) >> (7 - bitPos);
+            }
+            bitPos += bitsToStore;
+
           }
 
           resultImage.setRGB(x, y, new Color(pixelRGB[0], pixelRGB[1], pixelRGB[2]).getRGB());
@@ -139,7 +167,6 @@ public class Steganography extends Application {
 
     saveImage(resultImage, "out");
     HiderLayout.statusLabel.setText("Done");
-
 
   }
 
