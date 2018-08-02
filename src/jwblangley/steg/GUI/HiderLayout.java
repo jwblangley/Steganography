@@ -1,7 +1,6 @@
 package jwblangley.steg.GUI;
 
 import java.io.File;
-import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,7 +11,6 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import javax.imageio.ImageIO;
 import jwblangley.steg.run.Steganography;
 
 public class HiderLayout {
@@ -30,7 +28,7 @@ public class HiderLayout {
 
     // Border Top
     HBox borderTopLayout = new HBox(5);
-    borderTopLayout.setPrefSize(Steganography.WIDTH * 0.15, Steganography.HEIGHT * 0.1);
+    borderTopLayout.setPrefSize(Steganography.WIDTH * 0.25, Steganography.HEIGHT * 0.1);
 
     baseButton = new Button("Choose Base");
     baseButton.setFont(font);

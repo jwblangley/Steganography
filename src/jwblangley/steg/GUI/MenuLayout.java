@@ -12,7 +12,7 @@ public class MenuLayout {
 
   public static Pane layout(Stage window) {
     HBox layout = new HBox(5);
-    layout.setPrefSize(Steganography.WIDTH * 0.15, Steganography.HEIGHT * 0.1);
+    layout.setPrefSize(Steganography.WIDTH * 0.25, Steganography.HEIGHT * 0.1);
 
     Font font = new Font("Arial", Steganography.HEIGHT / 35);
 

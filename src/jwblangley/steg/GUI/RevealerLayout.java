@@ -25,7 +25,7 @@ public class RevealerLayout {
 
     // Border top
     HBox borderTopLayout = new HBox();
-    borderTopLayout.setPrefSize(Steganography.WIDTH * 0.15, Steganography.HEIGHT * 0.1);
+    borderTopLayout.setPrefSize(Steganography.WIDTH * 0.25, Steganography.HEIGHT * 0.1);
 
     Button imageButton = new Button("Choose Image");
     imageButton.setFont(font);

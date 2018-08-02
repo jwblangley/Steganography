@@ -3,8 +3,8 @@ package jwblangley.steg.run;
 import static jwblangley.steg.run.Utils.addBytesToList;
 import static jwblangley.steg.run.Utils.byteListToByteArray;
 import static jwblangley.steg.run.Utils.longToByteArray;
+import static jwblangley.steg.run.Utils.noOverrideFile;
 import static jwblangley.steg.run.Utils.saveImage;
-import static jwblangley.steg.run.Utils.unusedFile;
 
 import java.awt.Color;
 import java.awt.Toolkit;
@@ -110,8 +110,6 @@ public class Steganography extends Application {
             }
           }
 
-
-
           resultImage.setRGB(x, y, new Color(pixelRGB[0], pixelRGB[1], pixelRGB[2]).getRGB());
         }
       }
@@ -130,8 +128,10 @@ public class Steganography extends Application {
   public static void compileReveal() {
     //TODO: calculate data in dataOut and fileName
     byte[] dataOut = null;
+    String filename = null;
+
     try {
-      FileOutputStream stream = new FileOutputStream(unusedFile("reveal", fileExt));
+      FileOutputStream stream = new FileOutputStream(noOverrideFile(filename));
       stream.write(dataOut);
       stream.close();
     } catch (FileNotFoundException e) {
