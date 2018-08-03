@@ -181,11 +181,11 @@ public class Steganography extends Application {
       stream.write(dataOut);
       stream.close();
     } catch (FileNotFoundException e) {
-      RevealerLayout.statusLabel.setText("Error finding file");
+      Platform.runLater(()-> RevealerLayout.statusLabel.setText("Error finding location to write"));
     } catch (IOException e) {
-      RevealerLayout.statusLabel.setText("Error writing file");
+      Platform.runLater(()-> RevealerLayout.statusLabel.setText("Error writing file"));
     }
-    RevealerLayout.statusLabel.setText("Done");
+    Platform.runLater(()-> RevealerLayout.statusLabel.setText("Done"));
 
   }
 

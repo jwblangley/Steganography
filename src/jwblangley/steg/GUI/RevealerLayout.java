@@ -58,7 +58,7 @@ public class RevealerLayout {
       try {
         statusLabel.setText("Working...");
         Steganography.toBeRevealedImage = ImageIO.read(imageFile);
-        Steganography.compileReveal();
+        new Thread(() -> Steganography.compileReveal()).start();
       } catch (IOException e) {
         e.printStackTrace();
         statusLabel.setText("Error: Failed to read file");
