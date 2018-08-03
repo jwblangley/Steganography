@@ -80,4 +80,8 @@ public class Utils {
     return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
   }
 
+  public static int numBitsToMask(int numBits) {
+    return (1 << numBits) - 1;
+  }
+
 }
