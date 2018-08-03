@@ -74,7 +74,6 @@ public class Steganography extends Application {
     int pixB = firstCol.getBlue() & 1 & bitNum;
     resultImage.setRGB(0, 0, new Color(pixR, firstCol.getGreen(), pixB).getRGB());
 
-
     // To store indeterminate number of bytes in header
     List<Byte> headerBytes = new ArrayList<>();
 
@@ -106,55 +105,58 @@ public class Steganography extends Application {
       int bitPos = 0;
       int bytePos = 0;
 
+      boolean complete = false;
+
       // Data write loop
       for (int y = 0; y < resultImage.getHeight(); y++) {
         for (int x = (y == 0 ? 1 : 0); x < resultImage.getWidth(); x++) {
 
           // Base colour
-          Color col = new Color(baseImage.getRGB(x, y));
-          int[] pixelRGB = new int[]{col.getRed(), col.getGreen(), col.getGreen()};
+          Color baseCol = new Color(baseImage.getRGB(x, y));
+          int[] pixelRGB = new int[]{baseCol.getRed(), baseCol.getGreen(), baseCol.getBlue()};
 
           int readLen = 0;
           for (int c = 0; c < CHANNELS; c++) {
-            if (bitPos >= 8) {
-              bitPos = 0;
-              bytePos++;
-              if (bytePos < buf.length) {
-                bufferByte = buf[bytePos];
-              } else {
-                bytePos = 0;
-                buf = new byte[BUFFER_SIZE];
-                readLen = in.read(buf);
-                if (readLen < 0) {
-                  // byte stream complete
-                  break;
-                } else {
+            if (!complete) {
+              if (bitPos >= 8) {
+                bitPos = 0;
+                bytePos++;
+                if (bytePos < buf.length) {
                   bufferByte = buf[bytePos];
-                  bytePos++;
+                } else {
+                  bytePos = 0;
+                  buf = new byte[BUFFER_SIZE];
+                  readLen = in.read(buf);
+                  if (readLen < 0) {
+                    // byte stream complete
+                    complete = true;
+                    break;
+                  } else {
+                    bufferByte = buf[bytePos];
+                    bytePos++;
+                  }
                 }
               }
-            }
 
-            switch (bitsToStore) {
-              case 8:
-                pixelRGB[c] = bufferByte;
-                break;
-              case 4:
-                pixelRGB[c] &= 0xF0;
-                pixelRGB[c] += (bufferByte & (0xF << 4 - bitPos)) >> (4 - bitPos);
-                break;
-              case 2:
-                pixelRGB[c] &= 0xFC;
-                pixelRGB[c] += (bufferByte & (0x3 << 6 - bitPos)) >> (6 - bitPos);
-                break;
-              case 1:
-                pixelRGB[c] &= 0xFE;
-                pixelRGB[c] += (bufferByte & (0x1 << 7 - bitPos)) >> (7 - bitPos);
+              switch (bitsToStore) {
+                case 8:
+                  pixelRGB[c] = bufferByte + 128;
+                  break;
+                case 4:
+                  pixelRGB[c] &= 0xF0;
+                  pixelRGB[c] += (bufferByte & (0xF << 4 - bitPos)) >> (4 - bitPos);
+                  break;
+                case 2:
+                  pixelRGB[c] &= 0xFC;
+                  pixelRGB[c] += (bufferByte & (0x3 << 6 - bitPos)) >> (6 - bitPos);
+                  break;
+                case 1:
+                  pixelRGB[c] &= 0xFE;
+                  pixelRGB[c] += (bufferByte & (0x1 << 7 - bitPos)) >> (7 - bitPos);
+              }
+              bitPos += bitsToStore;
             }
-            bitPos += bitsToStore;
-
           }
-
           resultImage.setRGB(x, y, new Color(pixelRGB[0], pixelRGB[1], pixelRGB[2]).getRGB());
         }
       }
