@@ -7,9 +7,11 @@ import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -19,7 +21,7 @@ import jwblangley.steg.run.Steganography;
 
 public class HiderLayout {
 
-  private static Button baseButton, fileButton;
+  private static Button baseButton, fileButton, optionsButton;
   private static Stage window;
   public static Label statusLabel;
 
@@ -38,14 +40,24 @@ public class HiderLayout {
     baseButton.setFont(font);
     baseButton.setMinWidth(borderTopLayout.getPrefWidth() / 2);
     baseButton.setMaxHeight(Double.MAX_VALUE);
-    baseButton.setOnAction(HiderLayout::handleEvent);
+    baseButton.setOnAction(actionEvent -> {
+      FileChooser fc = new FileChooser();
+      fc.setTitle("Base image");
+      FileChooser.ExtensionFilter imageFilter
+          = new ExtensionFilter("Image Files", Steganography.IMAGE_EXTENSIONS);
+      fc.getExtensionFilters().add(imageFilter);
+      baseImageSelected(fc.showOpenDialog(window));
+    });
 
     fileButton = new Button("Choose File");
     fileButton.setFont(font);
     fileButton.setMinWidth(borderTopLayout.getPrefWidth() / 2);
     fileButton.setMaxHeight(Double.MAX_VALUE);
     fileButton.setDisable(true);
-    fileButton.setOnAction(HiderLayout::handleEvent);
+    fileButton.setOnAction(actionEvent -> {
+      FileChooser fc = new FileChooser();
+      fileSelected(fc.showOpenDialog(window));
+    });
 
     borderTopLayout.getChildren().addAll(baseButton, fileButton);
     topNode.setTop(borderTopLayout);
@@ -55,22 +67,35 @@ public class HiderLayout {
     statusLabel.setFont(Font.font("Arial", Steganography.HEIGHT / 50));
     topNode.setCenter(statusLabel);
 
+    // Options panel
+
+    optionsButton = new Button("▼");
+    optionsButton.setFont(font);
+    optionsButton.setDisable(true);
+    optionsButton.setOnAction(HiderLayout::handleEvent);
+    topNode.setRight(optionsButton);
+
+    VBox sliderBox = new VBox(5);
+
+    Label optionsLabel = new Label("Alteration Level");
+    optionsLabel.setFont(font);
+
+    Slider bitsToStoreSlider = new Slider();
+    bitsToStoreSlider.setMin(0);
+    bitsToStoreSlider.setMax(3);
+    bitsToStoreSlider.setValue(1);
+    bitsToStoreSlider.setMinorTickCount(0);
+    bitsToStoreSlider.setMajorTickUnit(1);
+    bitsToStoreSlider.setBlockIncrement(1);
+    bitsToStoreSlider.setSnapToTicks(true);
+    bitsToStoreSlider.setShowTickMarks(true);
+
+    sliderBox.getChildren().addAll(optionsLabel, bitsToStoreSlider);
+    topNode.setBottom(sliderBox);
+
+
+
     return topNode;
-  }
-
-  private static void handleEvent(ActionEvent e) {
-    // File chooser
-    FileChooser fc = new FileChooser();
-
-    if (e.getSource() == baseButton) {
-      fc.setTitle("Base image");
-      FileChooser.ExtensionFilter imageFilter
-          = new ExtensionFilter("Image Files", Steganography.IMAGE_EXTENSIONS);
-      fc.getExtensionFilters().add(imageFilter);
-      baseImageSelected(fc.showOpenDialog(window));
-    } else if (e.getSource() == fileButton) {
-      fileSelected(fc.showOpenDialog(window));
-    }
   }
 
   private static void fileSelected(File sourceFile) {
@@ -114,6 +139,7 @@ public class HiderLayout {
       statusLabel.setText("Cannot process this image type");
     }
     fileButton.setDisable(false);
+    optionsButton.setDisable(false);
   }
 
 
