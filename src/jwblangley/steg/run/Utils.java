@@ -10,11 +10,11 @@ public class Utils {
 
   public static File unusedFile(String filename, String fileExt, boolean dot) {
     int counter = 1;
-    File tempFile;
-    do {
-      tempFile = new File(filename + counter + (dot ? "." : "") + fileExt);
+    File tempFile = new File (filename + (dot ? "." : "") + fileExt);
+    while (tempFile.exists()) {
+      tempFile = new File(filename + "_" + counter + (dot ? "." : "") +fileExt);
       counter++;
-    } while (tempFile.exists());
+    }
     return tempFile;
   }
 

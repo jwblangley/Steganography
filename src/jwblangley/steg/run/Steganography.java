@@ -66,13 +66,13 @@ public class Steganography extends Application {
     // Store bitsToStore within first pixel for rest of image
     int bitNum;
     for (bitNum = 0; bitNum < 4; bitNum++) {
-      if (1 >> bitNum == bitsToStore) {
+      if (1 << bitNum == bitsToStore) {
         break;
       }
     }
     Color firstCol = new Color(baseImage.getRGB(0, 0));
-    int pixR = firstCol.getRed() & ((2 & bitNum) >> 1);
-    int pixB = firstCol.getBlue() & 1 & bitNum;
+    int pixR = firstCol.getRed() & (0xFE + ((2 & bitNum) >> 1));
+    int pixB = firstCol.getBlue() & (0xFE + (1 & bitNum));
     resultImage.setRGB(0, 0, new Color(pixR, firstCol.getGreen(), pixB).getRGB());
 
     // To store indeterminate number of bytes in header
@@ -102,7 +102,7 @@ public class Steganography extends Application {
 
       byte[] buf = byteListToByteArray(headerBytes);
 
-      byte bufferByte = 0;
+      int bufferByte = buf[0];
       int bitPos = 0;
       int bytePos = 0;
 
@@ -134,27 +134,14 @@ public class Steganography extends Application {
                     break;
                   } else {
                     bufferByte = buf[bytePos];
-                    bytePos++;
                   }
                 }
               }
+              pixelRGB[c] &= (0xFF - numBitsToMask(bitsToStore));
+              pixelRGB[c] +=
+                  (bufferByte & (numBitsToMask(bitsToStore) << (8 - bitsToStore - bitPos)))
+                      >> (8 - bitsToStore - bitPos);
 
-              switch (bitsToStore) {
-                case 8:
-                  pixelRGB[c] = bufferByte + 128;
-                  break;
-                case 4:
-                  pixelRGB[c] &= 0xF0;
-                  pixelRGB[c] += (bufferByte & (0xF << 4 - bitPos)) >> (4 - bitPos);
-                  break;
-                case 2:
-                  pixelRGB[c] &= 0xFC;
-                  pixelRGB[c] += (bufferByte & (0x3 << 6 - bitPos)) >> (6 - bitPos);
-                  break;
-                case 1:
-                  pixelRGB[c] &= 0xFE;
-                  pixelRGB[c] += (bufferByte & (0x1 << 7 - bitPos)) >> (7 - bitPos);
-              }
               bitPos += bitsToStore;
             }
           }
@@ -176,17 +163,17 @@ public class Steganography extends Application {
 
     // Calculate bits per pixel
     Color firstCol = new Color(toBeRevealedImage.getRGB(0, 0));
-    int bitsPerPixel = (firstCol.getRed() & 0x1) << 1 + firstCol.getBlue() & 0x1;
+    int bitsPerPixel = 1 << (((firstCol.getRed() & 0x1) << 1) + (firstCol.getBlue() & 0x1));
     Byte fileNameLength = null;
     String fileName = null;
     Long dataSize = null;
 
-    List<Byte> byteList = new ArrayList<>();
+    List<Byte> byteList = new ArrayList<Byte>();
     byte currentByte = 0;
     int bitIndex = 0;
 
     // Start reading in bytes from image
-    for (int y = 0; y < toBeRevealedImage.getHeight(); y++) {
+    outer: for (int y = 0; y < toBeRevealedImage.getHeight(); y++) {
       for (int x = (y == 0 ? 1 : 0); x < toBeRevealedImage.getWidth(); x++) {
         Color baseCol = new Color(toBeRevealedImage.getRGB(x, y));
         int[] pixelRGB = new int[]{baseCol.getRed(), baseCol.getGreen(), baseCol.getBlue()};
@@ -213,7 +200,7 @@ public class Steganography extends Application {
                   : "Filename has not been processed correctly";
               fileName = new String(byteListToByteArray(byteList), StandardCharsets.UTF_8);
               byteList.clear();
-            } else if (dataSize == null && byteList.size() >= 8) {
+            } else if (fileName!= null && dataSize == null && byteList.size() >= 8) {
               assert byteList.size() == 8 : "Data size has not been processed correctly";
               // 8 bytes in a long
               dataSize = 0L;
@@ -222,10 +209,8 @@ public class Steganography extends Application {
                 dataSize <<= i != 7 ? 8 : 0;
               }
               byteList.clear();
-            } else {
-              // TODO read in data as usual. List will only contain bytes of file after
-              System.out.println(fileName + "  " + dataSize);
-              return;
+            } else if (dataSize!= null && byteList.size() >= dataSize){
+              break outer;
             }
           }
         }
@@ -233,12 +218,12 @@ public class Steganography extends Application {
       }
     }
 
-    //TODO: calculate data in dataOut and fileName
-    byte[] dataOut = null;
-    String filename = null;
+
+    byte[] dataOut = byteListToByteArray(byteList);
+
 
     try {
-      FileOutputStream stream = new FileOutputStream(noOverrideFile(filename));
+      FileOutputStream stream = new FileOutputStream(noOverrideFile(fileName));
       stream.write(dataOut);
       stream.close();
     } catch (FileNotFoundException e) {
