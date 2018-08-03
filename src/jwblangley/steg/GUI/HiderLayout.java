@@ -4,7 +4,7 @@ import static jwblangley.steg.run.Utils.humanReadableByteCount;
 
 import java.io.File;
 import java.io.IOException;
-import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -68,17 +68,18 @@ public class HiderLayout {
     topNode.setCenter(statusLabel);
 
     // Options panel
+    VBox sliderBox = new VBox(5);
+    sliderBox.setPadding(new Insets(10,20,20,20));
+    sliderBox.setDisable(true);
 
-    optionsButton = new Button("▼");
-    optionsButton.setFont(font);
+    optionsButton = new Button("Advanced");
+    optionsButton.setFont(Font.font("Arial", Steganography.HEIGHT / 70));
     optionsButton.setDisable(true);
-    optionsButton.setOnAction(HiderLayout::handleEvent);
+    optionsButton.setOnAction(actionEvent -> sliderBox.setDisable(!sliderBox.isDisabled()));
     topNode.setRight(optionsButton);
 
-    VBox sliderBox = new VBox(5);
-
     Label optionsLabel = new Label("Alteration Level");
-    optionsLabel.setFont(font);
+    optionsLabel.setFont(Font.font("Arial", Steganography.HEIGHT / 50));
 
     Slider bitsToStoreSlider = new Slider();
     bitsToStoreSlider.setMin(0);
@@ -89,11 +90,12 @@ public class HiderLayout {
     bitsToStoreSlider.setBlockIncrement(1);
     bitsToStoreSlider.setSnapToTicks(true);
     bitsToStoreSlider.setShowTickMarks(true);
+    bitsToStoreSlider.valueProperty().addListener(observable -> {
+      updateStatusWithSize((int) bitsToStoreSlider.getValue());
+    });
 
     sliderBox.getChildren().addAll(optionsLabel, bitsToStoreSlider);
     topNode.setBottom(sliderBox);
-
-
 
     return topNode;
   }
@@ -120,26 +122,31 @@ public class HiderLayout {
     }
     try {
       Steganography.baseImage = ImageIO.read(baseImageFile);
-
-      // Calculate maximum file size
-      // First pixel taken to encode bitsToStore
-      long potentialSize =
-          (Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight() - 1)
-          * Steganography.CHANNELS * Steganography.bitsToStore / 8;
-      // 1 byte for filename size and a maximum of 255 bytes for filename;
-      potentialSize -= 256;
-      // 4 bytes for the long that stores the size of the source file;
-      potentialSize -= 4;
-      Steganography.maxFileSize = potentialSize;
-
-      statusLabel.setText("Max File size: "
-          + humanReadableByteCount(Steganography.maxFileSize, false));
+      updateStatusWithSize(1);
 
     } catch (IOException e) {
       statusLabel.setText("Cannot process this image type");
     }
     fileButton.setDisable(false);
     optionsButton.setDisable(false);
+  }
+
+  private static void updateStatusWithSize(int bitsSetting) {
+    Steganography.bitsToStore = 1 << bitsSetting;
+
+    // Calculate maximum file size
+    // First pixel taken to encode bitsToStore
+    long potentialSize =
+        (Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight() - 1)
+            * Steganography.CHANNELS * Steganography.bitsToStore / 8;
+    // 1 byte for filename size and a maximum of 255 bytes for filename;
+    potentialSize -= 256;
+    // 4 bytes for the long that stores the size of the source file;
+    potentialSize -= 4;
+    Steganography.maxFileSize = potentialSize;
+
+    statusLabel.setText("Max File size: "
+        + humanReadableByteCount(Steganography.maxFileSize, false));
   }
 
 
