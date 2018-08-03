@@ -172,6 +172,28 @@ public class Steganography extends Application {
   }
 
   public static void compileReveal() {
+
+    // Calculate bits per pixel
+    Color firstCol = new Color(toBeRevealedImage.getRGB(0, 0));
+    int bitsPerPixel = (firstCol.getRed() & 0x1) << 1 + firstCol.getBlue() & 0x1;
+
+    // Start reading in bytes from image
+    for (int y = 0; y < toBeRevealedImage.getHeight(); y++) {
+      for (int x = (y == 0 ? 1 : 0); x < toBeRevealedImage.getWidth(); x++) {
+        Color baseCol = new Color(toBeRevealedImage.getRGB(x, y));
+        int[] pixelRGB = new int[]{baseCol.getRed(), baseCol.getGreen(), baseCol.getBlue()};
+
+        for (int c = 0; c < CHANNELS; c++) {
+          // TODO read in all bytes then separate out
+        }
+
+      }
+    }
+
+
+
+
+
     //TODO: calculate data in dataOut and fileName
     byte[] dataOut = null;
     String filename = null;
@@ -181,11 +203,12 @@ public class Steganography extends Application {
       stream.write(dataOut);
       stream.close();
     } catch (FileNotFoundException e) {
-      Platform.runLater(()-> RevealerLayout.statusLabel.setText("Error finding location to write"));
+      Platform
+          .runLater(() -> RevealerLayout.statusLabel.setText("Error finding location to write"));
     } catch (IOException e) {
-      Platform.runLater(()-> RevealerLayout.statusLabel.setText("Error writing file"));
+      Platform.runLater(() -> RevealerLayout.statusLabel.setText("Error writing file"));
     }
-    Platform.runLater(()-> RevealerLayout.statusLabel.setText("Done"));
+    Platform.runLater(() -> RevealerLayout.statusLabel.setText("Done"));
 
   }
 
