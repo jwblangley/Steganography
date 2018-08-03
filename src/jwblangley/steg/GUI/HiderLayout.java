@@ -109,7 +109,8 @@ public class HiderLayout {
     if (sourceFile.length() < Steganography.maxFileSize) {
       statusLabel.setText("Working...");
       Steganography.sourceFile = sourceFile;
-      Steganography.compileHide();
+      // Run hide in separate thread to allow main thread to update GUI
+      new Thread(Steganography::compileHide).start();
     } else {
       statusLabel.setText("file too large".toUpperCase());
     }

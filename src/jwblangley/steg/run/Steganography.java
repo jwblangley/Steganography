@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
@@ -33,8 +34,7 @@ public class Steganography extends Application {
   public static BufferedImage baseImage, toBeRevealedImage;
   public static long maxFileSize;
 
-  // per colour channel, 1,2,4 or 8
-  //TODO: as slider
+  // per colour channel, 1,2,4 or 8 - 2 by default
   public static int bitsToStore = 2;
   // Allows file names to be up to 255 characters long
   public static final int NAME_HEADER_SIZE = 255;
@@ -81,7 +81,7 @@ public class Steganography extends Application {
     byte[] fileNameBytes = sourceFile.getName().getBytes(StandardCharsets.UTF_8);
 
     if (fileNameBytes.length > NAME_HEADER_SIZE) {
-      HiderLayout.statusLabel.setText("Filename too long");
+      Platform.runLater(() -> HiderLayout.statusLabel.setText("Filename too long"));
       return;
     }
 
@@ -162,12 +162,12 @@ public class Steganography extends Application {
       }
     } catch (IOException e) {
       e.printStackTrace();
-      HiderLayout.statusLabel.setText("Error reading file");
+      Platform.runLater(() -> HiderLayout.statusLabel.setText("Error reading file"));
       return;
     }
 
     saveImage(resultImage, "out");
-    HiderLayout.statusLabel.setText("Done");
+    Platform.runLater(() -> HiderLayout.statusLabel.setText("Done"));
 
   }
 
