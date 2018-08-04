@@ -89,6 +89,7 @@ public class Steganography extends Application {
     // Cannot overflow byte - enforced with NAME_HEADER_SIZE
     byte nameSize = (byte) fileNameBytes.length;
 
+
     headerBytes.add(nameSize);
     addBytesToList(headerBytes, fileNameBytes);
 
@@ -164,7 +165,7 @@ public class Steganography extends Application {
     // Calculate bits per pixel
     Color firstCol = new Color(toBeRevealedImage.getRGB(0, 0));
     int bitsPerPixel = 1 << (((firstCol.getRed() & 0x1) << 1) + (firstCol.getBlue() & 0x1));
-    Byte fileNameLength = null;
+    Integer fileNameLength = null;
     String fileName = null;
     Long dataSize = null;
 
@@ -192,7 +193,10 @@ public class Steganography extends Application {
             if (fileNameLength == null) {
               // No data queue size check needed as fileNameLength is only one byte
               assert byteList.size() == 1 : "Filename length not correctly processed";
-              fileNameLength = byteList.get(0);
+              // Fix signed int for byte
+              fileNameLength = byteList.get(0) < 0
+                  ? byteList.get(0) + 256
+                  : Integer.valueOf(byteList.get(0));
               byteList.clear();
             } else if (fileName == null && byteList.size() >= fileNameLength) {
               // Comparison order chosen for efficiency
@@ -205,7 +209,8 @@ public class Steganography extends Application {
               // 8 bytes in a long
               dataSize = 0L;
               for (int i = 0; i < 8; i++) {
-                dataSize += byteList.get(i);
+                // Fix signed int for byte
+                dataSize += byteList.get(i) < 0 ? byteList.get(i) + 256 : byteList.get(i);
                 dataSize <<= i != 7 ? 8 : 0;
               }
               byteList.clear();
