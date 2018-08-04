@@ -21,7 +21,7 @@ public class RevealerLayout {
 
   public static Pane layout(Stage window) {
     BorderPane topNode = new BorderPane();
-    Font font = new Font("Arial", Steganography.HEIGHT / 35);
+    Font font = new Font("Arial", Steganography.HEIGHT / 50);
 
     // Border top
     HBox borderTopLayout = new HBox();
@@ -39,7 +39,7 @@ public class RevealerLayout {
 
     // Rest of BorderPane
     statusLabel = new Label();
-    statusLabel.setFont(Font.font("Arial", Steganography.HEIGHT / 50));
+    statusLabel.setFont(Font.font("Arial", Steganography.HEIGHT / 75));
     topNode.setCenter(statusLabel);
 
     return topNode;

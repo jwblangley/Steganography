@@ -30,7 +30,7 @@ public class HiderLayout {
     window = windowIn;
 
     BorderPane topNode = new BorderPane();
-    Font font = new Font("Arial", Steganography.HEIGHT / 35);
+    Font font = new Font("Arial", Steganography.HEIGHT / 50);
 
     // Border Top
     HBox borderTopLayout = new HBox(5);
@@ -64,7 +64,7 @@ public class HiderLayout {
 
     // Rest of BorderPane
     statusLabel = new Label();
-    statusLabel.setFont(Font.font("Arial", Steganography.HEIGHT / 50));
+    statusLabel.setFont(Font.font("Arial", Steganography.HEIGHT / 75));
     topNode.setCenter(statusLabel);
 
     // Options panel
@@ -73,13 +73,13 @@ public class HiderLayout {
     sliderBox.setDisable(true);
 
     optionsButton = new Button("Advanced");
-    optionsButton.setFont(Font.font("Arial", Steganography.HEIGHT / 70));
+    optionsButton.setFont(Font.font("Arial", Steganography.HEIGHT / 90));
     optionsButton.setDisable(true);
     optionsButton.setOnAction(actionEvent -> sliderBox.setDisable(!sliderBox.isDisabled()));
     topNode.setRight(optionsButton);
 
     Label optionsLabel = new Label("Alteration Level");
-    optionsLabel.setFont(Font.font("Arial", Steganography.HEIGHT / 50));
+    optionsLabel.setFont(Font.font("Arial", Steganography.HEIGHT / 75));
 
     Slider bitsToStoreSlider = new Slider();
     bitsToStoreSlider.setMin(0);

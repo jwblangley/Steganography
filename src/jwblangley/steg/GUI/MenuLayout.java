@@ -14,7 +14,7 @@ public class MenuLayout {
     HBox layout = new HBox(5);
     layout.setPrefSize(Steganography.WIDTH * 0.25, Steganography.HEIGHT * 0.1);
 
-    Font font = new Font("Arial", Steganography.HEIGHT / 35);
+    Font font = new Font("Arial", Steganography.HEIGHT / 50);
 
     Button hideButton = new Button("Hide File");
     hideButton.setFont(font);
