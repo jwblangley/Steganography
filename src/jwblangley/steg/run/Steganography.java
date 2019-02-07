@@ -71,8 +71,8 @@ public class Steganography extends Application {
       }
     }
     Color firstCol = new Color(baseImage.getRGB(0, 0));
-    int pixR = firstCol.getRed() & (0xFE + ((2 & bitNum) >> 1));
-    int pixB = firstCol.getBlue() & (0xFE + (1 & bitNum));
+    int pixR = (firstCol.getRed() & 0xFE) + ((2 & bitNum) >> 1);
+    int pixB = (firstCol.getBlue() & 0xFE) + (1 & bitNum);
     resultImage.setRGB(0, 0, new Color(pixR, firstCol.getGreen(), pixB).getRGB());
 
     // To store indeterminate number of bytes in header
