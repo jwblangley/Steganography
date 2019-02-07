@@ -91,7 +91,7 @@ public class HiderLayout {
     bitsToStoreSlider.setSnapToTicks(true);
     bitsToStoreSlider.setShowTickMarks(true);
     bitsToStoreSlider.valueProperty().addListener(observable -> {
-      updateStatusWithSize((int) bitsToStoreSlider.getValue());
+      updateBitSetting((int) bitsToStoreSlider.getValue());
     });
 
     sliderBox.getChildren().addAll(optionsLabel, bitsToStoreSlider);
@@ -106,7 +106,7 @@ public class HiderLayout {
       return;
     }
 
-    if (sourceFile.length() < Steganography.maxFileSize) {
+    if (sourceFile.length() < Steganography.getMaxFileSize()) {
       statusLabel.setText("Working...");
       Steganography.sourceFile = sourceFile;
       // Run hide in separate thread to allow main thread to update GUI
@@ -123,7 +123,8 @@ public class HiderLayout {
     }
     try {
       Steganography.baseImage = ImageIO.read(baseImageFile);
-      updateStatusWithSize(1);
+      // Default value
+      updateBitSetting(1);
 
     } catch (IOException e) {
       statusLabel.setText("Cannot process this image type");
@@ -132,22 +133,12 @@ public class HiderLayout {
     optionsButton.setDisable(false);
   }
 
-  private static void updateStatusWithSize(int bitsSetting) {
-    Steganography.bitsToStore = 1 << bitsSetting;
-
-    // Calculate maximum file size
-    // First pixel taken to encode bitsToStore
-    long potentialSize =
-        (Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight() - 1)
-            * Steganography.CHANNELS * Steganography.bitsToStore / 8;
-    // 1 byte for filename size and a maximum of 255 bytes for filename;
-    potentialSize -= 256;
-    // 4 bytes for the long that stores the size of the source file;
-    potentialSize -= 4;
-    Steganography.maxFileSize = potentialSize;
+  private static void updateBitSetting(int bitSetting) {
+    int bitsPerPixel = 1 << bitSetting;
+    Steganography.setBitsPerPixel(bitsPerPixel);
 
     statusLabel.setText("Max File size: "
-        + humanReadableByteCount(Steganography.maxFileSize, false));
+        + humanReadableByteCount(Steganography.getMaxFileSize(), false));
   }
 
 

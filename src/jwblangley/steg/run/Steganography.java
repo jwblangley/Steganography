@@ -33,14 +33,16 @@ public class Steganography extends Application {
 
   public static File sourceFile;
   public static BufferedImage baseImage, toBeRevealedImage;
-  public static long maxFileSize;
 
   // per colour channel, 1,2,4 or 8 - 2 by default
-  public static int bitsToStore = 2;
+  public static int bitsPerPixel = 2;
+
   // Allows file names to be up to 255 characters long
   public static final int NAME_HEADER_SIZE = 255;
+
   // R G B
   public static final int CHANNELS = 3;
+
   // Must be a multiple of CHANNELS - 54KB
   public static final int BUFFER_SIZE = CHANNELS * 16 * 1024;
 
@@ -53,20 +55,46 @@ public class Steganography extends Application {
 
   private static Stage displayWindow;
 
+  // TODO: Convert to non-static implementation for a more usable design.
+
   public static void main(String[] args) {
     launch(args);
   }
 
+  public static long getMaxFileSize() {
+    // Calculates maximum file size for the current image
+
+    assert baseImage != null;
+
+    // NB. One pixel taken to encode bitsPerPixel
+    long potentialSize =
+        (Steganography.baseImage.getWidth() * Steganography.baseImage.getHeight() - 1)
+            * Steganography.CHANNELS * Steganography.bitsPerPixel / 8;
+
+    // 1 byte for filename size and a maximum of 255 bytes for filename;
+    potentialSize -= 256;
+
+    // 4 bytes for the long that stores the size of the source file;
+    potentialSize -= 4;
+
+    return potentialSize;
+  }
+
+  public static void setBitsPerPixel(int bitsPerPixel) {
+    Steganography.bitsPerPixel = bitsPerPixel;
+  }
+
   public static void compileHide() {
-    //TODO assertions (size of image)
+    assert sourceFile.length() <= getMaxFileSize()
+        : "The given file is too large to be hidden within the given image";
 
     BufferedImage resultImage = new BufferedImage(baseImage.getWidth(), baseImage.getHeight(),
         BufferedImage.TYPE_INT_RGB);
 
-    // Store bitsToStore within first pixel for rest of image
+    // Store bitsPerPixel within first pixel for rest of image
     int bitNum;
     for (bitNum = 0; bitNum < 4; bitNum++) {
-      if (1 << bitNum == bitsToStore) {
+      if (1 << bitNum == bitsPerPixel) {
         break;
       }
     }
@@ -137,12 +165,12 @@ public class Steganography extends Application {
                   }
                 }
               }
-              pixelRGB[c] &= (0xFF - numOfBitsToMask(bitsToStore));
+              pixelRGB[c] &= (0xFF - numOfBitsToMask(bitsPerPixel));
               pixelRGB[c] +=
-                  (bufferByte & (numOfBitsToMask(bitsToStore) << (8 - bitsToStore - bitPos)))
-                      >> (8 - bitsToStore - bitPos);
+                  (bufferByte & (numOfBitsToMask(bitsPerPixel) << (8 - bitsPerPixel - bitPos)))
+                      >> (8 - bitsPerPixel - bitPos);
 
-              bitPos += bitsToStore;
+              bitPos += bitsPerPixel;
             }
           }
           resultImage.setRGB(x, y, new Color(pixelRGB[0], pixelRGB[1], pixelRGB[2]).getRGB());
@@ -163,7 +191,7 @@ public class Steganography extends Application {
 
     // Calculate bits per pixel
     Color firstCol = new Color(toBeRevealedImage.getRGB(0, 0));
-    int bitsPerPixel = 1 << (((firstCol.getRed() & 0x1) << 1) + (firstCol.getBlue() & 0x1));
+    int embeddedBitsPerPixel = 1 << (((firstCol.getRed() & 0x1) << 1) + (firstCol.getBlue() & 0x1));
 
     Integer fileNameLength = null;
     String fileName = null;
@@ -181,9 +209,9 @@ public class Steganography extends Application {
         int[] pixelRGB = new int[]{baseCol.getRed(), baseCol.getGreen(), baseCol.getBlue()};
 
         for (int c = 0; c < CHANNELS; c++) {
-          currentByte <<= bitsPerPixel;
-          currentByte += pixelRGB[c] & numOfBitsToMask(bitsPerPixel);
-          bitIndex += bitsPerPixel;
+          currentByte <<= embeddedBitsPerPixel;
+          currentByte += pixelRGB[c] & numOfBitsToMask(embeddedBitsPerPixel);
+          bitIndex += embeddedBitsPerPixel;
 
           // Byte complete
           if (bitIndex >= 8) {
