@@ -4,7 +4,7 @@ import static jwblangley.steg.run.Utils.addBytesToList;
 import static jwblangley.steg.run.Utils.byteListToByteArray;
 import static jwblangley.steg.run.Utils.longToByteArray;
 import static jwblangley.steg.run.Utils.noOverrideFile;
-import static jwblangley.steg.run.Utils.numBitsToMask;
+import static jwblangley.steg.run.Utils.numOfBitsToMask;
 import static jwblangley.steg.run.Utils.saveImage;
 
 import java.awt.Color;
@@ -138,9 +138,9 @@ public class Steganography extends Application {
                   }
                 }
               }
-              pixelRGB[c] &= (0xFF - numBitsToMask(bitsToStore));
+              pixelRGB[c] &= (0xFF - numOfBitsToMask(bitsToStore));
               pixelRGB[c] +=
-                  (bufferByte & (numBitsToMask(bitsToStore) << (8 - bitsToStore - bitPos)))
+                  (bufferByte & (numOfBitsToMask(bitsToStore) << (8 - bitsToStore - bitPos)))
                       >> (8 - bitsToStore - bitPos);
 
               bitPos += bitsToStore;
@@ -181,7 +181,7 @@ public class Steganography extends Application {
 
         for (int c = 0; c < CHANNELS; c++) {
           currentByte <<= bitsPerPixel;
-          currentByte += pixelRGB[c] & numBitsToMask(bitsPerPixel);
+          currentByte += pixelRGB[c] & numOfBitsToMask(bitsPerPixel);
           bitIndex += bitsPerPixel;
 
           // Byte complete
