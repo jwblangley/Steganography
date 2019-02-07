@@ -10,9 +10,9 @@ public class Utils {
 
   public static File unusedFile(String filename, String fileExt, boolean dot) {
     int counter = 1;
-    File tempFile = new File (filename + (dot ? "." : "") + fileExt);
+    File tempFile = new File(filename + (dot ? "." : "") + fileExt);
     while (tempFile.exists()) {
-      tempFile = new File(filename + "_" + counter + (dot ? "." : "") +fileExt);
+      tempFile = new File(filename + "_" + counter + (dot ? "." : "") + fileExt);
       counter++;
     }
     return tempFile;
@@ -52,7 +52,6 @@ public class Utils {
   }
 
   public static byte[] longToByteArray(long x) {
-    //TODO: test this
     // Big endian
     final int SIZE_OF_LONG = 8;
     byte[] arr = new byte[SIZE_OF_LONG];

@@ -69,7 +69,7 @@ public class HiderLayout {
 
     // Options panel
     VBox sliderBox = new VBox(5);
-    sliderBox.setPadding(new Insets(10,20,20,20));
+    sliderBox.setPadding(new Insets(10, 20, 20, 20));
     sliderBox.setDisable(true);
 
     optionsButton = new Button("Advanced");

@@ -89,7 +89,6 @@ public class Steganography extends Application {
     // Cannot overflow byte - enforced with NAME_HEADER_SIZE
     byte nameSize = (byte) fileNameBytes.length;
 
-
     headerBytes.add(nameSize);
     addBytesToList(headerBytes, fileNameBytes);
 
@@ -174,7 +173,8 @@ public class Steganography extends Application {
     int bitIndex = 0;
 
     // Start reading in bytes from image
-    outer: for (int y = 0; y < toBeRevealedImage.getHeight(); y++) {
+    outer:
+    for (int y = 0; y < toBeRevealedImage.getHeight(); y++) {
       for (int x = (y == 0 ? 1 : 0); x < toBeRevealedImage.getWidth(); x++) {
         Color baseCol = new Color(toBeRevealedImage.getRGB(x, y));
         int[] pixelRGB = new int[]{baseCol.getRed(), baseCol.getGreen(), baseCol.getBlue()};
@@ -204,7 +204,7 @@ public class Steganography extends Application {
                   : "Filename has not been processed correctly";
               fileName = new String(byteListToByteArray(byteList), StandardCharsets.UTF_8);
               byteList.clear();
-            } else if (fileName!= null && dataSize == null && byteList.size() >= 8) {
+            } else if (fileName != null && dataSize == null && byteList.size() >= 8) {
               assert byteList.size() == 8 : "Data size has not been processed correctly";
               // 8 bytes in a long
               dataSize = 0L;
@@ -214,7 +214,7 @@ public class Steganography extends Application {
                 dataSize <<= i != 7 ? 8 : 0;
               }
               byteList.clear();
-            } else if (dataSize!= null && byteList.size() >= dataSize){
+            } else if (dataSize != null && byteList.size() >= dataSize) {
               break outer;
             }
           }
@@ -223,9 +223,7 @@ public class Steganography extends Application {
       }
     }
 
-
     byte[] dataOut = byteListToByteArray(byteList);
-
 
     try {
       FileOutputStream stream = new FileOutputStream(noOverrideFile(fileName));
