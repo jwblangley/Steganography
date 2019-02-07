@@ -164,6 +164,7 @@ public class Steganography extends Application {
     // Calculate bits per pixel
     Color firstCol = new Color(toBeRevealedImage.getRGB(0, 0));
     int bitsPerPixel = 1 << (((firstCol.getRed() & 0x1) << 1) + (firstCol.getBlue() & 0x1));
+
     Integer fileNameLength = null;
     String fileName = null;
     Long dataSize = null;
@@ -198,12 +199,14 @@ public class Steganography extends Application {
                   ? byteList.get(0) + 256
                   : Integer.valueOf(byteList.get(0));
               byteList.clear();
+
             } else if (fileName == null && byteList.size() >= fileNameLength) {
               // Comparison order chosen for efficiency
               assert byteList.size() == fileNameLength
                   : "Filename has not been processed correctly";
               fileName = new String(byteListToByteArray(byteList), StandardCharsets.UTF_8);
               byteList.clear();
+
             } else if (fileName != null && dataSize == null && byteList.size() >= 8) {
               assert byteList.size() == 8 : "Data size has not been processed correctly";
               // 8 bytes in a long
@@ -214,6 +217,7 @@ public class Steganography extends Application {
                 dataSize <<= i != 7 ? 8 : 0;
               }
               byteList.clear();
+
             } else if (dataSize != null && byteList.size() >= dataSize) {
               break outer;
             }
